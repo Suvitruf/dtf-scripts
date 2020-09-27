@@ -1,0 +1,11 @@
+node_modules
+.idea
+public/vehicle_photos
+.DS_Store
+coverage
+.nyc_output
+newrelic_agent\.log
+report*.json
+dist
+.env
+upload
