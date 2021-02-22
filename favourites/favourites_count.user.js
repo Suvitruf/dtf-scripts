@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        dtf favourites counter
-// @version     1
+// @version     2
 // @namespace   https://github.com/Suvitruf/dtf-scripts
 // @updateURL   https://github.com/Suvitruf/dtf-scripts/raw/master/favourites/favourites_count.meta.js
 // @downloadURL https://github.com/Suvitruf/dtf-scripts/raw/master/favourites/favourites_count.user.js
