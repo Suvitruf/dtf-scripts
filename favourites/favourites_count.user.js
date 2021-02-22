@@ -58,6 +58,8 @@ function getCount(text, favBlock) {
         counter           = document.createElement('div');
         counter.id        = 'favorite_suvitruf_counter';
         counter.innerText = count;
+        counter.classList.add("comments_counter__count__value");
+        counter.classList.add("comments_counter");
 
         favBlock.parentNode.appendChild(counter);
     }
