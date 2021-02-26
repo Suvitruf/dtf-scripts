@@ -1,6 +1,6 @@
 // ==UserScript==
-// @name        dtf favourites counter
-// @version     2
+// @name        dtf/tj favourites counter
+// @version     3
 // @namespace   https://github.com/Suvitruf/dtf-scripts
 // @updateURL   https://github.com/Suvitruf/dtf-scripts/raw/master/favourites/favourites_count.meta.js
 // @downloadURL https://github.com/Suvitruf/dtf-scripts/raw/master/favourites/favourites_count.user.js
@@ -8,6 +8,8 @@
 // @author      Suvitruf
 // @include     *://*.dtf.ru*
 // @include     *://dtf.ru/*
+// @include     *://*.tjournal.ru*
+// @include     *://tjournal.ru/*
 // @grant       none
 // ==/UserScript==
 (function () {
@@ -60,7 +62,10 @@ function getCount(text, favBlock) {
         counter.innerText = count;
         counter.classList.add("comments_counter__count__value");
         counter.classList.add("comments_counter");
-
+        favBlock.parentNode.onclick = () => {
+            let intCount = parseInt(counter.innerText);
+            counter.innerText = counter.parentNode.classList.contains('favorite_marker--active') ? intCount + 1 : intCount - 1;
+        }
         favBlock.parentNode.appendChild(counter);
     }
 }
