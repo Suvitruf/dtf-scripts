@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        dtf/tj reply with quote
-// @version     2
+// @version     3
 // @namespace   https://github.com/Suvitruf/dtf-scripts
 // @updateURL   https://github.com/Suvitruf/dtf-scripts/raw/master/reply-with-quote/reply-with-quote.meta.js
 // @downloadURL https://github.com/Suvitruf/dtf-scripts/raw/master/reply-with-quote/reply-with-quote.user.js
@@ -50,7 +50,7 @@ function addReplyButtons() {
             if (item.nodeName.toLowerCase() !== 'span')
                 continue;
 
-            item.innerHTML = 'Циата';
+            item.innerHTML = 'Цитата';
         }
 
         newButtons.push({

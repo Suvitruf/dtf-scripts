@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        dtf/tj favourites counter
-// @version     2
+// @version     3
 // @namespace   https://github.com/Suvitruf/dtf-scripts
 // @description Добавляет кнопку для ответа с цитатой
 // @author      Suvitruf
