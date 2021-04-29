@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        dtf/tj reply with quote
-// @version     3
+// @version     4
 // @namespace   https://github.com/Suvitruf/dtf-scripts
 // @updateURL   https://github.com/Suvitruf/dtf-scripts/raw/master/reply-with-quote/reply-with-quote.meta.js
 // @downloadURL https://github.com/Suvitruf/dtf-scripts/raw/master/reply-with-quote/reply-with-quote.user.js
@@ -33,7 +33,8 @@ function formatText(text) {
 }
 
 function addReplyButtons() {
-    const replyButtons = document.querySelectorAll('div[class="comments__item__reply"]:not(.already_added_reply_quote)'); // check by class if it has already been added
+    const replyButtons = document.querySelectorAll('div[class*="comments__item__reply"]:not(.already_added_reply_quote)'); // check by class if it has already been added
+
     if (!replyButtons || !replyButtons.length)
         return;
 
@@ -41,6 +42,7 @@ function addReplyButtons() {
     for (const button of replyButtons) {
         button.classList.add('already_added_reply_quote'); // add the class to prevent recursion buttons
         const copyButton = button.cloneNode(true);
+        copyButton.style.cssText = "-moz-user-select: -moz-none; -khtml-user-select: none; -webkit-user-select: none; -ms-user-select: none; user-select: none;"; // add styles to prevent the selection from unselect but it will be still unselect
         const children   = copyButton.childNodes;
         for (const child in children) {
             if (!children.hasOwnProperty(child))
@@ -49,7 +51,6 @@ function addReplyButtons() {
             const item = children[child];
             if (item.nodeName.toLowerCase() !== 'span')
                 continue;
-
             item.innerHTML = 'Цитата';
         }
 
@@ -68,9 +69,11 @@ function addReplyButtons() {
             continue;
 
         const rootNode = parent.parentNode.parentNode;
-        const text     = contentNodes[0].innerText;
 
         button.button.addEventListener('click', function () {
+            const text = window.getSelection().toString() || contentNodes[0].innerText; // if we have selected text - get it otherwise get all the text of comment
+            window.getSelection().removeAllRanges(); // just remove selected text after
+
             // при клике на "ответить" создаётся инпут
             // мне лень копаться в инвентах и что-то там переопределять, поэтому просто ждём какое-то время
             // через которое это поле явно уже будет создано
@@ -92,13 +95,11 @@ function addReplyButtons() {
 
 addReplyButtons();
 
-// Overriding AJAX request and add our button on new page
-(function () {
-    const send                    = XMLHttpRequest.prototype.send;
-    XMLHttpRequest.prototype.send = function () {
-        this.addEventListener('load', function () {
-            addReplyButtons();
-        });
-        return send.apply(this, arguments);
-    }
-})()
+// Welp, don't override AJAX request cuz it's shit idea. Just set listener :)
+addEventListener('DOMContentLoaded', function() {
+    addReplyButtons();
+});
+
+addEventListener('DOMNodeInserted', function() {
+    addReplyButtons();
+});
