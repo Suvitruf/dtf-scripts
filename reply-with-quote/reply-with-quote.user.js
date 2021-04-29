@@ -33,15 +33,15 @@ function formatText(text) {
 }
 
 function addReplyButtons() {
-    const replyButtons = document.getElementsByClassName('comments__item__reply');
+    const replyButtons = document.querySelectorAll('div[class="comments__item__reply"]:not(.already_added_reply_quote)'); // check by class if it has already been added
     if (!replyButtons || !replyButtons.length)
         return;
 
     const newButtons = [];
     for (const button of replyButtons) {
+        button.classList.add('already_added_reply_quote'); // add the class to prevent recursion buttons
         const copyButton = button.cloneNode(true);
         const children   = copyButton.childNodes;
-
         for (const child in children) {
             if (!children.hasOwnProperty(child))
                 continue;
@@ -91,3 +91,14 @@ function addReplyButtons() {
 }
 
 addReplyButtons();
+
+// Overriding AJAX request and add our button on new page
+(function() {
+    const send = XMLHttpRequest.prototype.send
+    XMLHttpRequest.prototype.send = function() {
+        this.addEventListener('load', function() {
+            addReplyButtons();
+        })
+        return send.apply(this, arguments)
+    }
+})()
