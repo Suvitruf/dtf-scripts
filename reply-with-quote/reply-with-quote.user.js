@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        dtf/tj reply with quote
-// @version     1
+// @version     2
 // @namespace   https://github.com/Suvitruf/dtf-scripts
 // @updateURL   https://github.com/Suvitruf/dtf-scripts/raw/master/reply-with-quote/reply-with-quote.meta.js
 // @downloadURL https://github.com/Suvitruf/dtf-scripts/raw/master/reply-with-quote/reply-with-quote.user.js
@@ -50,18 +50,18 @@ function addReplyButtons() {
             if (item.nodeName.toLowerCase() !== 'span')
                 continue;
 
-            item.innerHTML = 'Ответить с цитатой';
+            item.innerHTML = 'Циата';
         }
 
         newButtons.push({
-            button: copyButton,
-            parent: button.parentNode
+            button:         copyButton,
+            originalButton: button
         });
     }
 
     for (const button of newButtons) {
-        const parent = button.parent;
-        parent.appendChild(button.button);
+        const parent = button.originalButton.parentNode;
+        button.originalButton.after(button.button);
 
         const contentNodes = parent.getElementsByClassName('comments__item__text');
         if (!contentNodes || !contentNodes.length)
@@ -93,12 +93,12 @@ function addReplyButtons() {
 addReplyButtons();
 
 // Overriding AJAX request and add our button on new page
-(function() {
-    const send = XMLHttpRequest.prototype.send
-    XMLHttpRequest.prototype.send = function() {
-        this.addEventListener('load', function() {
+(function () {
+    const send                    = XMLHttpRequest.prototype.send;
+    XMLHttpRequest.prototype.send = function () {
+        this.addEventListener('load', function () {
             addReplyButtons();
-        })
-        return send.apply(this, arguments)
+        });
+        return send.apply(this, arguments);
     }
 })()
