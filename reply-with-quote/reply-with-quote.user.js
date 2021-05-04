@@ -41,9 +41,9 @@ function addReplyButtons() {
     const newButtons = [];
     for (const button of replyButtons) {
         button.classList.add('already_added_reply_quote'); // add the class to prevent recursion buttons
-        const copyButton = button.cloneNode(true);
-        copyButton.style.cssText = "-moz-user-select: -moz-none; -khtml-user-select: none; -webkit-user-select: none; -ms-user-select: none; user-select: none;"; // add styles to prevent the selection from unselect but it will be still unselect
-        const children   = copyButton.childNodes;
+        const copyButton         = button.cloneNode(true);
+        copyButton.style.cssText = '-moz-user-select: -moz-none; -khtml-user-select: none; -webkit-user-select: none; -ms-user-select: none; user-select: none;'; // add styles to prevent the selection from unselect but it will be still unselect
+        const children           = copyButton.childNodes;
         for (const child in children) {
             if (!children.hasOwnProperty(child))
                 continue;
@@ -96,10 +96,10 @@ function addReplyButtons() {
 addReplyButtons();
 
 // Welp, don't override AJAX request cuz it's shit idea. Just set listener :)
-addEventListener('DOMContentLoaded', function() {
+addEventListener('DOMContentLoaded', function () {
     addReplyButtons();
 });
 
-addEventListener('DOMNodeInserted', function() {
+addEventListener('DOMNodeInserted', function () {
     addReplyButtons();
 });
