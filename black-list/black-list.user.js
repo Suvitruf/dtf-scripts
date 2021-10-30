@@ -27,6 +27,8 @@ GM_addStyle(`
         --image-size: 36px;
         --image-radius: 6px;
         --grid-gap: 16px;
+        height: 420px;
+        overflow: auto;
     }
 
     .black-list-item {
