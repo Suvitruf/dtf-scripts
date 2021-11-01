@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Отображение счётчиков количества статей и комментариев в профилях участников
-// @version     1
+// @version     2
 // @namespace   https://github.com/Suvitruf/dtf-scripts
 // @description Возвращаем количество постов и комментариев в профиле
 // @author      Apanasik aka Suvitruf
@@ -19,12 +19,12 @@ const userIdRx  = /\/u\/([0-9]*)/;
 
 let dataSet = false;
 
-async function loadProfile(id) {
-    console.log('loadProfile');
+async function loadProfile(id, host) {
+    console.log('loadProfile', id);
 
     // я не смог вытащить этих данных из текущей страницы
     // поэтому пока единственным решением вижу её скачать вручную и спарсить
-    const profile = await fetch(`https://dtf.ru/u/${id}`);
+    const profile = await fetch(`https://${host}/u/${id}`);
     if (profile.status !== 200)
         return;
 
@@ -62,20 +62,21 @@ function clear() {
 
 async function checkIfProfile() {
     // получаем текущий адрес и проверяем на то, что это профиль
-    const location = document.location.href;
+    const location = document.location;
+    const href     = location.href;
 
     // не какая-либо страница юзера
-    const uIndex = location.indexOf('/u/');
+    const uIndex = href.indexOf('/u/');
     // явно не профиль
     if (uIndex === -1) {
         clear();
         return;
     }
 
-    const lastSlash = location.lastIndexOf('/');
+    const lastSlash = href.lastIndexOf('/');
     // какая-то юзерская страница, но не корневая
     if (lastSlash !== uIndex + 2) {
-        const rx = profileRx.exec(location);
+        const rx = profileRx.exec(href);
 
         // скорей всего конкретный пост
         if (!(rx && rx.length && rx.length >= 4 && rx[3])) {
@@ -91,9 +92,9 @@ async function checkIfProfile() {
         return;
 
     // вытаскиваем id юзера
-    const id = userIdRx.exec(location);
+    const id = userIdRx.exec(href);
 
-    await loadProfile(id[1]);
+    await loadProfile(id[1], location.host);
 }
 
 async function checkProfile() {

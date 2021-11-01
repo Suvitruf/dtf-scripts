@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Отображение счётчиков количества статей и комментариев в профилях участников
-// @version     1
+// @version     2
 // @namespace   https://github.com/Suvitruf/dtf-scripts
 // @description Возвращаем количество постов и комментариев в профиле
 // @author      Apanasik aka Suvitruf
