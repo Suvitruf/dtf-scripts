@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Отображение счётчиков количества статей и комментариев в профилях участников
-// @version     2
+// @version     3
 // @namespace   https://github.com/Suvitruf/dtf-scripts
 // @description Возвращаем количество постов и комментариев в профиле
 // @author      Apanasik aka Suvitruf
@@ -19,9 +19,47 @@ const userIdRx  = /\/u\/([0-9]*)/;
 
 let dataSet = false;
 
-async function loadProfile(id, host) {
-    console.log('loadProfile', id);
+function setCounter(urlPart, label, value) {
+    const tabBlock = document.querySelector(`a[href*="${urlPart}"][class*="v-tab"]`);
+    if (!tabBlock)
+        return;
 
+    tabBlock.firstChild.innerHTML = `<span class="v-tab__label">${label}<span class="v-tab__counter">${value}</span></span>`;
+}
+
+async function loadProfileViaAPI(id, host) {
+    // я не смог вытащить этих данных из текущей страницы
+    // поэтому пока единственным решением вижу её скачать вручную и спарсить
+    const profile = await fetch(`https://api.${host}/v1.9/user/${id}`);
+    if (profile.status !== 200)
+        return;
+
+    const rawData = await profile.json();
+
+    // может быть 403 ошибка, если, к примеру, администрация скрыла профиль
+    // профиль того же Олегоси не получить через api
+    if (rawData.error) {
+        console.error('cant load profile info: ', rawData.message);
+
+        return;
+    }
+
+    const json = rawData.result;
+
+    if (!json || !json.counters)
+        return;
+
+    const postsCount    = json.counters.entries;
+    const commentsCount = json.counters.comments;
+
+    setCounter('entries', 'Статьи', postsCount);
+    setCounter('comments', 'Комментарии', commentsCount);
+
+    dataSet = true;
+}
+
+
+async function loadProfileAsIs(id, host) {
     // я не смог вытащить этих данных из текущей страницы
     // поэтому пока единственным решением вижу её скачать вручную и спарсить
     const profile = await fetch(`https://${host}/u/${id}`);
@@ -29,9 +67,6 @@ async function loadProfile(id, host) {
         return;
 
     const rawData = await profile.text();
-
-    // console.log(document.documentElement.outerHTML);
-    // const rawData = document.documentElement.outerHTML;
 
     const data  = rawData.match(/<textarea(.*?){(.*?)<\/textarea>/gms);
     const raw   = data[0];
@@ -51,6 +86,16 @@ async function loadProfile(id, host) {
             continue;
 
         tabBlock.firstChild.innerHTML = `<span class="v-tab__label">${tab.label}<span class="v-tab__counter">${tab.counter}</span></span>`;
+    }
+}
+
+async function loadProfile(id, host) {
+    console.log('loadProfile', id);
+    try {
+        await loadProfileViaAPI(id, host);
+    } catch (e) {
+        console.error(e);
+        await loadProfileAsIs(id, host);
     }
 
     dataSet = true;
