@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        dtf/tj favourites counter
-// @version     3
+// @version     4
 // @namespace   https://github.com/Suvitruf/dtf-scripts
 // @updateURL   https://github.com/Suvitruf/dtf-scripts/raw/master/favourites/favourites_count.meta.js
 // @downloadURL https://github.com/Suvitruf/dtf-scripts/raw/master/favourites/favourites_count.user.js
@@ -15,8 +15,6 @@
 (function () {
     startChecker();
 })();
-
-const FAVOURITES_REGEX = /\"favorites\":\s+([0-9]*),/;
 
 let lastBlock;
 
@@ -46,14 +44,13 @@ function startChecker() {
 
         if (dataBlock !== null && (lastBlock === null || lastBlock !== favBlock)) {
             lastBlock = favBlock;
-            getCount(dataBlock.firstChild.data, favBlock);
+            getCount(dataBlock, favBlock);
         }
     }, 3000);
 }
 
-function getCount(text, favBlock) {
-    const res   = FAVOURITES_REGEX.exec(text);
-    const count = res[1];
+function getCount(dataBlock, favBlock) {
+    const count = JSON.parse(dataBlock.dataset.articleInfo).favorites;
 
     let counter = document.getElementById('favorite_suvitruf_counter');
     if (!counter) {
