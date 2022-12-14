@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        dtf/tj dislikes counter
-// @version     4
+// @version     5
 // @namespace   https://github.com/Suvitruf/dtf-scripts
 // @updateURL   https://github.com/Suvitruf/dtf-scripts/raw/master/dislikes/dislikes_count.meta.js
 // @downloadURL https://github.com/Suvitruf/dtf-scripts/raw/master/dislikes/dislikes_count.user.js
@@ -47,7 +47,6 @@ async function startChecker() {
 
         const data = await post.json();
         const likesSum = data.result.likes.summ;
-
         setCounters(likes, likesSum, location);
 
     }, 2000);
@@ -70,5 +69,5 @@ function setCounters(likes, likesSum, location){
     if (!likesSpan)
         return;
 
-    likesSpan.innerHTML = likes + '/' + (likesSum - likes);
+    likesSpan.innerHTML = likes + ' (' + likesSum + '/' + Math.abs(likes - likesSum) + ')';
 }
