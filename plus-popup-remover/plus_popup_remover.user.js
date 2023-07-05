@@ -1,0 +1,45 @@
+// ==UserScript==
+// @name        dtf/tj plus popup remover
+// @version     1
+// @namespace   https://github.com/Suvitruf/dtf-scripts
+// @description Вырезает надоедливое окно о покупке плюса
+// @author      Apanasik Andrei
+// @updateURL   https://github.com/Suvitruf/dtf-scripts/raw/master/plus-popup-remover/plus_popup_remover.meta.js
+// @downloadURL https://github.com/Suvitruf/dtf-scripts/raw/master/plus-popup-remover/plus_popup_remover.user.js
+// @include     *://*.dtf.ru*
+// @include     *://dtf.ru/*
+// @include     *://*.tjournal.ru*
+// @include     *://tjournal.ru/*
+// @grant       none
+// ==/UserScript==
+
+(function () {
+    subOnChanges();
+})();
+
+function subOnChanges() {
+    // корневой контейнер
+    const container = document.querySelector('.app--content-entry');
+
+    const observer = new MutationObserver(() => {
+        const plusPopup = document.querySelector('.plus-sheet');
+
+        // если на странице есть попап
+        if (plusPopup) {
+            // возвращаем основной скрол на странице
+            container.style.overflow = '';
+
+            // вырезаем попап
+            container.removeChild(plusPopup.parentNode.parentNode.parentNode);
+        }
+    });
+    const config   = {
+        characterData: false,
+        attributes:    true,
+        childList:     true,
+        subtree:       false,
+    };
+
+    // подписываемся на его изменения
+    observer.observe(container, config);
+}
