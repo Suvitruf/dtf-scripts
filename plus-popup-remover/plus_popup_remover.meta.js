@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        dtf/tj plus popup remover
-// @version     1
+// @version     2
 // @namespace   https://github.com/Suvitruf/dtf-scripts
 // @description Вырезает надоедливое окно о покупке плюса
 // @author      Apanasik Andrei
