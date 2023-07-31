@@ -6,31 +6,47 @@
 // @author      Suvitruf
 // @updateURL   https://github.com/Suvitruf/dtf-scripts/raw/master/counter/dtf_counter.meta.js
 // @downloadURL https://github.com/Suvitruf/dtf-scripts/raw/master/counter/dtf_counter.user.js
-// @include     *://*.dtf.ru*
-// @include     *://dtf.ru/*
+// @include     *://*dtf.ru/u/*/drafts?writing=*
 // @grant       none
 // ==/UserScript==
 (function () {
-    addBlock();
-    startCounter();
+    waitForElm('.editor-cp-tabs').then((elem) => {
+        addBlock(elem);
+        startCounter();
+    });
 })();
+
+/***
+ * Ожидание появления элемента по selector'у
+ * https://stackoverflow.com/questions/5525071/how-to-wait-until-an-element-exists
+ */
+
+function waitForElm(selector) {
+    return new Promise(resolve => {
+        if (document.querySelector(selector)) {
+            return resolve(document.querySelector(selector));
+        }
+
+        const observer = new MutationObserver(mutations => {
+            if (document.querySelector(selector)) {
+                resolve(document.querySelector(selector));
+                observer.disconnect();
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
+}
 
 /***
  * Стартуем таймер, который раз в секунду будет пересчитывать.
  */
+
 function startCounter() {
     setInterval(function () {
-        const countersBlock = document.getElementById('counters_block');
-        // я хз, почему на dtf не ловятся события смены адреса типа popstate, HashChangeEvent и т.п.
-        // приходится по таймеру проверять текущий адрес
-        if (!isWriting()) {
-            // и если не черновик, то скрывать запись
-            countersBlock.style.display = 'none';
-
-            return;
-        }
-        countersBlock.style.display = '';
-
         const block      = document.getElementsByClassName('ce-block__content');
         const paragraphs = document.getElementsByClassName('ce-paragraph');
 
@@ -58,38 +74,43 @@ function startCounter() {
     }, 1000);
 }
 
-/***
- * Проверяем, находимся ли в режиме редактирования статьи.
- * @returns {boolean} true, если на странице редактирования статьи
- */
-function isWriting() {
-    return window.location.href.indexOf('/writing') > 0;
+function addBlock(parent) {
+    const countersContent             = document.createElement('div');
+    countersContent.className         = 'editor-cp-tab__content';
+    countersContent.id                = 'counters_block'
+
+    const counterMenu = document.createElement('div');
+    ['words_counter', 'letters_counter', 'paragraphs_counter'].forEach((id) => {
+        const pElem = document.createElement('p');
+        pElem.id = id;
+        counterMenu.appendChild(pElem);
+    });
+    countersContent.appendChild(counterMenu);
+
+    const countersDiv     = document.createElement('div');
+    countersDiv.className = 'editor-cp-tab';
+    countersDiv.id        = 'counter_div'
+
+    countersDiv.addEventListener("click", () => {
+        const counterBlock = document.getElementById('counter_div');
+        counterBlock.className = counterBlock.className === 'editor-cp-tab'
+                                    ? 'editor-cp-tab editor-cp-tab--active'
+                                    : 'editor-cp-tab';
+    });
+
+    const countersLabel     = document.createElement('div');
+    countersLabel.className = 'editor-cp-tab__label';
+
+    const label     = document.createElement('span');
+    label.innerText = 'Статистика';
+    countersLabel.appendChild(label);
+
+    countersDiv.appendChild(countersLabel);
+    countersDiv.appendChild(countersContent);
+
+    parent.insertAdjacentElement('beforeend', countersDiv);
 }
 
-function addBlock() {
-    const postWrapper = document.getElementById('page_wrapper');
-
-    const countersBlock             = document.createElement('div');
-    countersBlock.id                = 'counters_block';
-    countersBlock.style.height      = '100%';
-    countersBlock.style.position    = 'absolute';
-    countersBlock.style.paddingLeft = '200px';
-
-    const wordsCounter = document.createElement('p');
-    wordsCounter.id    = 'words_counter';
-
-    const lettersCounter = document.createElement('p');
-    lettersCounter.id    = 'letters_counter';
-
-    const paragraphsCounter = document.createElement('p');
-    paragraphsCounter.id    = 'paragraphs_counter';
-
-    countersBlock.appendChild(wordsCounter);
-    countersBlock.appendChild(lettersCounter);
-    countersBlock.appendChild(paragraphsCounter);
-
-    postWrapper.insertAdjacentElement('afterend', countersBlock);
-}
 
 function calc(txt) {
     const words   = countWords(txt);

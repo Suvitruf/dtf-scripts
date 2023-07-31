@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        dtf/tj dislikes counter
-// @version     4
+// @version     5
 // @namespace   https://github.com/Suvitruf/dtf-scripts
 // @description Добавляет счётчики дизлайков в посты
 // @author      Suvitruf
