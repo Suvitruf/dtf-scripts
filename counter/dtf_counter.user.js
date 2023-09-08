@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name        dtf counter
-// @version     2
+// @version     3
 // @namespace   https://github.com/Suvitruf/dtf-scripts
 // @description Добавляет счётчики на страницу редактирования статьи
 // @author      Suvitruf
 // @updateURL   https://github.com/Suvitruf/dtf-scripts/raw/master/counter/dtf_counter.meta.js
 // @downloadURL https://github.com/Suvitruf/dtf-scripts/raw/master/counter/dtf_counter.user.js
-// @include     *://*dtf.ru/u/*writing=*
+// @include     *://dtf.ru/*
 // @grant       none
 // ==/UserScript==
 const URL_REGEX = new RegExp('dtf.ru/u/(.*)writing=');
@@ -108,6 +108,10 @@ function startCounter() {
 }
 
 function addBlock(parent) {
+    const curCounter = document.getElementById('counters_block');
+    if (curCounter)
+        return;
+
     const countersContent     = document.createElement('div');
     countersContent.className = 'editor-cp-tab__content';
     countersContent.id        = 'counters_block'
