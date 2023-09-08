@@ -1,20 +1,53 @@
 // ==UserScript==
 // @name        dtf counter
-// @version     1
+// @version     2
 // @namespace   https://github.com/Suvitruf/dtf-scripts
 // @description Добавляет счётчики на страницу редактирования статьи
 // @author      Suvitruf
 // @updateURL   https://github.com/Suvitruf/dtf-scripts/raw/master/counter/dtf_counter.meta.js
 // @downloadURL https://github.com/Suvitruf/dtf-scripts/raw/master/counter/dtf_counter.user.js
-// @include     *://*dtf.ru/u/*/drafts?writing=*
+// @include     *://*dtf.ru/u/*writing=*
 // @grant       none
 // ==/UserScript==
-(function () {
+const URL_REGEX = new RegExp('dtf.ru/u/(.*)writing=');
+
+let oldHref = document.location.href;
+let updater = null;
+
+function checkElem() {
     waitForElm('.editor-cp-tabs').then((elem) => {
         addBlock(elem);
         startCounter();
     });
+}
+
+(function () {
+    checkElem();
 })();
+
+
+window.onload = function () {
+    const bodyList = document.querySelector('body')
+
+    const observer = new MutationObserver(function (mutations) {
+        if (oldHref !== document.location.href) {
+            oldHref = document.location.href;
+            if (URL_REGEX.test(oldHref))
+                checkElem();
+            else {
+                if (updater)
+                    clearInterval(updater);
+            }
+        }
+    });
+
+    const config = {
+        childList: true,
+        subtree:   true
+    };
+
+    observer.observe(bodyList, config);
+};
 
 /***
  * Ожидание появления элемента по selector'у
@@ -36,7 +69,7 @@ function waitForElm(selector) {
 
         observer.observe(document.body, {
             childList: true,
-            subtree: true
+            subtree:   true
         });
     });
 }
@@ -46,7 +79,7 @@ function waitForElm(selector) {
  */
 
 function startCounter() {
-    setInterval(function () {
+    updater = setInterval(function () {
         const block      = document.getElementsByClassName('ce-block__content');
         const paragraphs = document.getElementsByClassName('ce-paragraph');
 
@@ -75,14 +108,14 @@ function startCounter() {
 }
 
 function addBlock(parent) {
-    const countersContent             = document.createElement('div');
-    countersContent.className         = 'editor-cp-tab__content';
-    countersContent.id                = 'counters_block'
+    const countersContent     = document.createElement('div');
+    countersContent.className = 'editor-cp-tab__content';
+    countersContent.id        = 'counters_block'
 
     const counterMenu = document.createElement('div');
     ['words_counter', 'letters_counter', 'paragraphs_counter'].forEach((id) => {
         const pElem = document.createElement('p');
-        pElem.id = id;
+        pElem.id    = id;
         counterMenu.appendChild(pElem);
     });
     countersContent.appendChild(counterMenu);
@@ -91,11 +124,11 @@ function addBlock(parent) {
     countersDiv.className = 'editor-cp-tab';
     countersDiv.id        = 'counter_div'
 
-    countersDiv.addEventListener("click", () => {
-        const counterBlock = document.getElementById('counter_div');
+    countersDiv.addEventListener('click', () => {
+        const counterBlock     = document.getElementById('counter_div');
         counterBlock.className = counterBlock.className === 'editor-cp-tab'
-                                    ? 'editor-cp-tab editor-cp-tab--active'
-                                    : 'editor-cp-tab';
+            ? 'editor-cp-tab editor-cp-tab--active'
+            : 'editor-cp-tab';
     });
 
     const countersLabel     = document.createElement('div');
@@ -116,7 +149,10 @@ function calc(txt) {
     const words   = countWords(txt);
     const letters = countLetters(txt);
 
-    return {words, letters};
+    return {
+        words,
+        letters
+    };
 }
 
 function countWords(s) {
